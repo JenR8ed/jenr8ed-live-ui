@@ -2,7 +2,6 @@ export async function onRequestPost(context) {
   const { request, env } = context;
   const body = await request.json();
   
-  // Your custom routing agent instructions
   const systemInstruction = `You are the interactive routing agent for the JenR8ed Ecosystem.
 Your goal is to act as a graphical user interface (GUI) rendered entirely in Markdown. Do not converse like a standard chatbot. You are a system dashboard.
 FORMATTING RULES (STRICT):

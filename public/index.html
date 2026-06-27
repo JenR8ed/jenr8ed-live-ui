@@ -7,7 +7,6 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <style>
-        /* Custom scrollbar and markdown styling for the terminal */
         ::-webkit-scrollbar { width: 8px; }
         ::-webkit-scrollbar-track { background: #020617; }
         ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
@@ -71,16 +70,13 @@
                 });
                 
                 const data = await res.json();
-                
-                // Remove loading indicator
                 loadingIndicator.style.display = 'none';
                 
-                // Append AI Response
                 const aiWrapper = document.createElement('div');
                 aiWrapper.className = 'markdown-body text-sm bg-slate-900/50 rounded-lg p-5 border border-slate-800/50';
                 aiWrapper.innerHTML = marked.parse(data.reply);
                 output.appendChild(aiWrapper);
-                output.appendChild(loadingIndicator); // Move loading to bottom
+                output.appendChild(loadingIndicator);
                 output.scrollTop = output.scrollHeight;
                 
             } catch (err) {
@@ -89,7 +85,6 @@
             }
         }
 
-        // Initialize dashboard on load
         window.addEventListener('DOMContentLoaded', () => {
             sendToAgent("Hello");
         });
@@ -99,7 +94,6 @@
             const msg = input.value.trim();
             if(!msg) return;
             
-            // Append User Message
             const userWrapper = document.createElement('div');
             userWrapper.className = 'text-slate-400 text-sm pl-2 border-l-2 border-blue-500 mb-4';
             userWrapper.textContent = `➜ ~ ${msg}`;
