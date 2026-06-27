@@ -2,20 +2,112 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>JenR8ed | Active AI Workspace</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JenR8ed | Edge Agent Terminal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <style>
-        body, html {
-            margin: 0; padding: 0; width: 100%; height: 100%;
-            background-color: #020617;
-            overflow: hidden;
-        }
-        iframe {
-            width: 100vw; height: 100vh; border: none; display: block;
-        }
+        /* Custom scrollbar and markdown styling for the terminal */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #020617; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+        .markdown-body h1 { font-size: 1.5rem; font-weight: bold; color: #38bdf8; margin-bottom: 1rem; }
+        .markdown-body h3 { font-size: 1.1rem; font-weight: bold; color: #2dd4bf; margin-top: 1.5rem; margin-bottom: 0.5rem; }
+        .markdown-body p { margin-bottom: 1rem; color: #cbd5e1; }
+        .markdown-body blockquote { border-left: 4px solid #3b82f6; padding-left: 1rem; color: #94a3b8; font-style: italic; margin-bottom: 1rem; }
+        .markdown-body table { width: 100%; text-align: left; border-collapse: collapse; margin-bottom: 1rem; }
+        .markdown-body th, .markdown-body td { padding: 0.75rem; border-bottom: 1px solid #1e293b; }
+        .markdown-body th { color: #f8fafc; font-weight: 600; }
+        .markdown-body code { background: #1e293b; padding: 0.2rem 0.4rem; border-radius: 0.25rem; font-family: monospace; color: #a78bfa; }
     </style>
 </head>
-<body>
-    <iframe src="https://aistudio.google.com/apps/243effa6-1b52-45de-be97-fcf328e9b9a9?showPreview=true&showAssistant=true" allow="clipboard-read; clipboard-write; microphone"></iframe>
+<body class="bg-slate-950 flex items-center justify-center min-h-screen p-4 font-mono">
+
+    <div class="w-full max-w-4xl h-[80vh] border border-slate-800 rounded-xl overflow-hidden shadow-2xl bg-[#0b1120] flex flex-col">
+        <div class="px-4 py-3 flex justify-between items-center text-xs text-slate-500 border-b border-slate-800 bg-slate-950">
+            <span class="flex items-center gap-2">
+                <div class="flex gap-1.5">
+                    <div class="w-3 h-3 rounded-full bg-red-500/20 border border-red-500/50"></div>
+                    <div class="w-3 h-3 rounded-full bg-yellow-500/20 border border-yellow-500/50"></div>
+                    <div class="w-3 h-3 rounded-full bg-emerald-500/20 border border-emerald-500/50"></div>
+                </div>
+                <span class="ml-2">jenr8ed-live-ui — bash</span>
+            </span>
+            <span class="text-emerald-500 flex items-center gap-2">
+                <span class="relative flex h-2 w-2"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span><span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span></span>
+                EDGE ROUTER ONLINE
+            </span>
+        </div>
+
+        <div id="output" class="flex-1 overflow-y-auto p-6 space-y-6">
+            <div class="flex items-center space-x-2 text-slate-500 text-sm animate-pulse" id="loadingIndicator">
+                <span>Initializing agent protocol...</span>
+            </div>
+        </div>
+
+        <div class="p-4 bg-slate-900 border-t border-slate-800">
+            <form id="terminalForm" class="flex items-center gap-3">
+                <span class="text-blue-500 font-bold">➜</span>
+                <span class="text-teal-400 font-bold">~</span>
+                <input type="text" id="userInput" class="flex-1 bg-transparent border-none outline-none text-slate-200 placeholder-slate-600 focus:ring-0" placeholder="Type a command or selection..." autocomplete="off" autofocus>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        const output = document.getElementById('output');
+        const form = document.getElementById('terminalForm');
+        const input = document.getElementById('userInput');
+        const loadingIndicator = document.getElementById('loadingIndicator');
+
+        async function sendToAgent(message) {
+            loadingIndicator.style.display = 'flex';
+            
+            try {
+                const res = await fetch('/api/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message })
+                });
+                
+                const data = await res.json();
+                
+                // Remove loading indicator
+                loadingIndicator.style.display = 'none';
+                
+                // Append AI Response
+                const aiWrapper = document.createElement('div');
+                aiWrapper.className = 'markdown-body text-sm bg-slate-900/50 rounded-lg p-5 border border-slate-800/50';
+                aiWrapper.innerHTML = marked.parse(data.reply);
+                output.appendChild(aiWrapper);
+                output.appendChild(loadingIndicator); // Move loading to bottom
+                output.scrollTop = output.scrollHeight;
+                
+            } catch (err) {
+                loadingIndicator.style.display = 'none';
+                console.error(err);
+            }
+        }
+
+        // Initialize dashboard on load
+        window.addEventListener('DOMContentLoaded', () => {
+            sendToAgent("Hello");
+        });
+
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const msg = input.value.trim();
+            if(!msg) return;
+            
+            // Append User Message
+            const userWrapper = document.createElement('div');
+            userWrapper.className = 'text-slate-400 text-sm pl-2 border-l-2 border-blue-500 mb-4';
+            userWrapper.textContent = `➜ ~ ${msg}`;
+            output.insertBefore(userWrapper, loadingIndicator);
+            
+            input.value = '';
+            sendToAgent(msg);
+        });
+    </script>
 </body>
 </html>
