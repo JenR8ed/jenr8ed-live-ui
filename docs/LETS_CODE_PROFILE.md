@@ -24,7 +24,9 @@ See resume for full experience.
 ## Projects
 ai-list-assist
 alos-marketing
-jenr8ed-sqatester
+01-20260626-Gitlab-AI-Infra
+jenr8ed-writing-hub
+pahvtc-core-assets
 
 ## Open To
 XPRIZE, Open Source, AI Engineering, Research, Consulting
@@ -34,6 +36,6 @@ AI/ML Engineers, Open Source, Cloud Computing, Data Science, QA Community
 
 ## Social
 GitHub: https://github.com/JenR8ed
-LinkedIn: https://linkedin.com/in/jenr8ed
+LinkedIn: https://linkedin.com/in/jenr8ed-ai
 Portfolio: https://jenr8ed.live
 Discord: jenr8edbyme
